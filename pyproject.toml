@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "click"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "u64cmd"
+authors = [
+    {name = "Christian Vogelgsang", email = "chris@vogelgsang.org"},
+]
+description = "A command line tool to remote control your Ultimate 64 or Ultimate II+ device."
+requires-python = ">=3.7"
+keywords = ["C64", "Ultimate 64", "Ultimate II+", "Ultimate 1541"]
+license = {text = "BSD"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+]
+dynamic = ["version", "readme"]
+
+[tool.setuptools]
+include-package-data = true
+packages = ["u64cmd"]
+
+[tool.setuptools.dynamic]
+readme = { file="README.md", content-type="text/markdown" }
+
+[tool.setuptools_scm]
+
+[project.scripts]
+u64cmd = "u64cmd.cli:cli"

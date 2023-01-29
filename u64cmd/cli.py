@@ -62,6 +62,46 @@ def prg_load(sock, prg_file, run, jump):
         sock.cmd_dma(data)
 
 
+@cli.command("data_load")
+@click.argument("data_file", type=click.Path(exists=True))
+@click.option("--addr", "-a", type=BASED_INT, default=0xC000)
+@click.option("--offset", "-o", type=BASED_INT, default=0)
+@click.option("--size", "-s", type=BASED_INT, default=0)
+@pass_socket
+def data_load(sock, data_file, addr, offset, size):
+    click.echo(f"loading data file '{click.format_filename(data_file)}'... ", nl=False)
+    with open(data_file, "rb") as fh:
+        data = fh.read()
+    if offset > 0:
+        data = data[offset:]
+    if size > 0:
+        data = data[0:size]
+    click.echo(f"@{addr:04x} +{offset:04x} #{len(data):04x}")
+    sock.cmd_dma_write(addr, data)
+
+
+@cli.command("poke")
+@click.argument("addr", type=BASED_INT)
+@click.argument("value", type=BASED_INT)
+@pass_socket
+def poke(sock, addr, value):
+    addr &= 0xFFFF
+    value &= 0xFF
+    click.echo(f"poke({addr:04x},{value:02x})")
+    sock.cmd_dma_write(addr, struct.pack("B", value))
+
+
+@cli.command("pokew")
+@click.argument("addr", type=BASED_INT)
+@click.argument("value", type=BASED_INT)
+@pass_socket
+def poke(sock, addr, value):
+    addr &= 0xFFFF
+    value &= 0xFFFF
+    click.echo(f"poke({addr:04x},{value:02x})")
+    sock.cmd_dma_write(addr, struct.pack(">H", value))
+
+
 @cli.command("reu_load")
 @click.argument("reu_file", type=click.Path(exists=True))
 @click.option("--addr", "-a", type=BASED_INT, default=0)
@@ -91,6 +131,49 @@ def reu_load(sock, reu_file, addr, offset, size):
         print(sum, total_size)
 
 
+@cli.command("disk_load")
+@click.argument("disk_file", type=click.Path(exists=True))
+@click.option("--run", "-r", is_flag=True)
+@pass_socket
+def img_load(sock, disk_file, run):
+    click.echo(f"loading disk file '{click.format_filename(disk_file)}'... ", nl=False)
+    # read data
+    with open(disk_file, "rb") as fh:
+        data = fh.read()
+    if run:
+        click.echo("run")
+        sock.cmd_run_image(data)
+    else:
+        click.echo("mount")
+        sock.cmd_mount_image(data)
+
+
+@cli.command("crt_load")
+@click.argument("crt_file", type=click.Path(exists=True))
+@pass_socket
+def crt_load(sock, crt_file):
+    click.echo(f"loading crt file '{click.format_filename(crt_file)}'... ", nl=False)
+    # read data
+    with open(crt_file, "rb") as fh:
+        data = fh.read()
+    click.echo("run")
+    sock.cmd_run_cart(data)
+
+
+@cli.command("kernal_load")
+@click.argument("kernal_file", type=click.Path(exists=True))
+@pass_socket
+def crt_load(sock, kernal_file):
+    click.echo(
+        f"loading kernal file '{click.format_filename(kernal_file)}'... ", nl=False
+    )
+    # read data
+    with open(kernal_file, "rb") as fh:
+        data = fh.read()
+    click.echo("done")
+    sock.cmd_kernal_write(data)
+
+
 @cli.command("reset")
 @pass_socket
 def reset(sock):
@@ -105,10 +188,10 @@ def reset(sock):
     sock.cmd_poweroff()
 
 
-@cli.command("keyb")
+@cli.command("type")
 @click.argument("text")
 @pass_socket
-def keyb(sock, text):
+def type(sock, text):
     click.echo(f"typing '{text}'")
     raw_text = util.decode_text(text)
     sock.cmd_keyb(raw_text)

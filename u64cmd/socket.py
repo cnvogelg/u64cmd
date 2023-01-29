@@ -72,7 +72,7 @@ class U64Socket:
     def cmd_dma_write(self, offset, data):
         """Write bytes directly into C64 memory"""
         off = struct.pack("<H", offset)
-        self._send_cmd(SOCKET_CMD_DMAWRITE, offet + data)
+        self._send_cmd(SOCKET_CMD_DMAWRITE, off + data)
 
     def cmd_keyb(self, text):
         """Type in text"""
@@ -97,10 +97,13 @@ class U64Socket:
 
     def cmd_kernal_write(self, data):
         # strange: 2 bytes are skipped at the beginning (PRG?)
-        self._send_cmd(SOCKET_CMD_KERNELWRITE, bytes(2) + data)
+        self._send_cmd(SOCKET_CMD_KERNALWRITE, bytes(2) + data)
 
     def cmd_mount_image(self, data):
         self._send_cmd(SOCKET_CMD_MOUNT_IMG, data)
 
     def cmd_run_image(self, data):
         self._send_cmd(SOCKET_CMD_RUN_IMG, data)
+
+    def cmd_run_cart(self, data):
+        self._send_cmd(SOCKET_CMD_RUN_CRT, data)

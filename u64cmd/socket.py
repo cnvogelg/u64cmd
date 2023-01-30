@@ -26,8 +26,24 @@ SOCKET_CMD_VICSTREAM_OFF = 0xFF30
 SOCKET_CMD_AUDIOSTREAM_OFF = 0xFF31
 SOCKET_CMD_DEBUGSTREAM_OFF = 0xFF32
 
+# Undocumented, shall only be used by developers.
+SOCKET_CMD_LOADSIDCRT   = 0xFF71
+SOCKET_CMD_LOADBOOTCRT  = 0xFF72
+SOCKET_CMD_READFLASH    = 0xFF75
+SOCKET_CMD_DEBUG_REG    = 0xFF76
+
 REU_MAX_SIZE = 65536 - 4
 
+STREAM_ID_VIC = 0
+STREAM_ID_AUDIO = 1
+STREAM_ID_DEBUG = 2
+
+STREAM_NAMES = ("vic", "audio", "debug")
+STREAM_MAP = {
+    "vic": STREAM_ID_VIC,
+    "audio": STREAM_ID_AUDIO,
+    "debug": STREAM_ID_DEBUG
+}
 
 class U64Socket:
     def __init__(self, host, port=64):
@@ -107,3 +123,13 @@ class U64Socket:
 
     def cmd_run_cart(self, data):
         self._send_cmd(SOCKET_CMD_RUN_CRT, data)
+
+    def cmd_stream_on(self, stream_id, duration=0, addr=None):
+        # data
+        hdr = struct.pack("<H", duration)
+        if addr:
+            hdr += addr.encode('ascii')
+        self._send_cmd(SOCKET_CMD_VICSTREAM_ON + stream_id, hdr)
+
+    def cmd_stream_off(self, stream_id):
+        self._send_cmd(SOCKET_CMD_VICSTREAM_OFF + stream_id)

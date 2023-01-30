@@ -30,8 +30,8 @@ pass_socket = click.make_pass_decorator(socket.U64Socket, ensure=True)
 
 
 @click.group(chain=True)
-@click.argument("host")
-@click.option("--port", "-p", type=int, default=64)
+@click.option("--host", "-h", envvar="U64CMD_HOST", required=True)
+@click.option("--port", "-p", envvar="U64CMD_PORT", type=int, default=64)
 @click.pass_context
 def cli(ctx, host, port):
     click.echo(f"connecting '{host}':{port}")
@@ -62,14 +62,14 @@ def prg_load(sock, prg_file, run, jump):
         sock.cmd_dma(data)
 
 
-@cli.command("data_load")
+@cli.command("data_write")
 @click.argument("data_file", type=click.Path(exists=True))
 @click.option("--addr", "-a", type=BASED_INT, default=0xC000)
 @click.option("--offset", "-o", type=BASED_INT, default=0)
 @click.option("--size", "-s", type=BASED_INT, default=0)
 @pass_socket
-def data_load(sock, data_file, addr, offset, size):
-    click.echo(f"loading data file '{click.format_filename(data_file)}'... ", nl=False)
+def data_write(sock, data_file, addr, offset, size):
+    click.echo(f"writing data file '{click.format_filename(data_file)}'... ", nl=False)
     with open(data_file, "rb") as fh:
         data = fh.read()
     if offset > 0:
@@ -78,6 +78,26 @@ def data_load(sock, data_file, addr, offset, size):
         data = data[0:size]
     click.echo(f"@{addr:04x} +{offset:04x} #{len(data):04x}")
     sock.cmd_dma_write(addr, data)
+
+
+@cli.command("stream_on")
+@click.argument("stream_name", type=click.Choice(socket.STREAM_NAMES))
+@click.option("--duration", "-d", type=BASED_INT, default=0)
+@click.option("--addr", "-a", type=click.STRING)
+@pass_socket
+def stream_on(sock, stream_name, duration, addr):
+    stream_id = socket.STREAM_MAP[stream_name]
+    click.echo(f"enable streaming {stream_name}/{stream_id} (duration={duration}, addr={addr})")
+    sock.cmd_stream_on(stream_id, duration, addr)
+
+
+@cli.command("stream_off")
+@click.argument("stream_name", type=click.Choice(socket.STREAM_NAMES))
+@pass_socket
+def stream_off(sock, stream_name):
+    stream_id = socket.STREAM_MAP[stream_name]
+    click.echo(f"disable streaming {stream_name}/{stream_id}")
+    sock.cmd_stream_off(stream_id)
 
 
 @cli.command("poke")

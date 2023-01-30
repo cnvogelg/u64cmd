@@ -32,6 +32,7 @@ pass_socket = click.make_pass_decorator(socket.U64Socket, ensure=True)
 @click.group(chain=True)
 @click.option("--host", "-h", envvar="U64CMD_HOST", required=True)
 @click.option("--port", "-p", envvar="U64CMD_PORT", type=int, default=64)
+@click.version_option()
 @click.pass_context
 def cli(ctx, host, port):
     click.echo(f"connecting '{host}':{port}")

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm", "click"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -17,6 +17,9 @@ classifiers = [
     "Programming Language :: Python",
 ]
 dynamic = ["version", "readme"]
+dependencies = [
+    "click"
+]
 
 [tool.setuptools]
 include-package-data = true

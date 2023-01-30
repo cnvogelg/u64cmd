@@ -87,7 +87,9 @@ def data_write(sock, data_file, addr, offset, size):
 @pass_socket
 def stream_on(sock, stream_name, duration, addr):
     stream_id = socket.STREAM_MAP[stream_name]
-    click.echo(f"enable streaming {stream_name}/{stream_id} (duration={duration}, addr={addr})")
+    click.echo(
+        f"enable streaming {stream_name}/{stream_id} (duration={duration}, addr={addr})"
+    )
     sock.cmd_stream_on(stream_id, duration, addr)
 
 

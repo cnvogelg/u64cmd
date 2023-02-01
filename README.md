@@ -64,6 +64,7 @@ Usage:
 
 * The option `--version` shows the release version of the tool.
 * The option `--help` gives you a command overview.
+* Use `... <command> --help` to get detailed help on a command
 * The option `--dump-keycodes|-D` shows a list of known petcat control
   commands for typing message (see `type` command)
 

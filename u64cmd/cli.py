@@ -29,9 +29,24 @@ BASED_INT = BasedIntParamType()
 pass_socket = click.make_pass_decorator(socket.U64Socket, ensure=True)
 
 
+def dump_keycodes(ctx, param, value):
+    click.echo("Use '{keycode}' in your type string:")
+    for key, value in util.CTRL_TABLE.items():
+        click.echo(f"{key:8} {value}")
+    ctx.exit()
+
+
 @click.group(chain=True)
 @click.option("--host", "-h", envvar="U64CMD_HOST", required=True)
 @click.option("--port", "-p", envvar="U64CMD_PORT", type=int, default=64)
+@click.option(
+    "--dump-keycodes",
+    "-D",
+    is_flag=True,
+    callback=dump_keycodes,
+    expose_value=False,
+    is_eager=True,
+)
 @click.version_option()
 @click.pass_context
 def cli(ctx, host, port):

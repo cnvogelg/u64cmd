@@ -9,7 +9,7 @@ release:
 	python3 -m build
 
 upload: release
-        twine upload dist/*
+	twine upload dist/*
 
 clean:
 	rm -rf dist
